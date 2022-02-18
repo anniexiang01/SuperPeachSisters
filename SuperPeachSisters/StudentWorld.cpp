@@ -24,12 +24,12 @@ int StudentWorld::init() //construct representation of current level (populate w
 {
     Level lev(assetPath());
     
-    ostringstream oss;
+    ostringstream oss; //use string streams to code level file through getLevel()
     oss << "level";
     oss.fill('0');
     oss << setw(2) << getLevel() << ".txt";
+    string level_file = oss.str();
     
-    string level_file = oss.str(); //use string streams to code level file through getLevel()
     Level::LoadResult result = lev.loadLevel(level_file);
     if (result == Level::load_fail_file_not_found)
      cerr << "Could not find data file" << endl;
@@ -91,10 +91,8 @@ int StudentWorld::move()
     while (it != m_actor.end()) //all actors do something
     {
         if ((*it)->isAlive())
-        {
             (*it)->doSomething();
-            it++;
-        }
+        it++;
     }
     
     m_peach->doSomething();
@@ -142,9 +140,47 @@ int StudentWorld::move()
 
 void StudentWorld::cleanUp()
 {
-    while (m_actor.size() != 0){ //not sure if this will work tbh
-        delete m_actor[m_actor.size()-1];
-        m_actor.pop_back(); //less complexity than 1st element, idk if need this line
+    vector<Actor*>:: iterator it;
+    while (it != m_actor.end()) //calls delete on all Actors, vector still have pointers but they point to nothing
+    {
+        delete *it;
+        it++;
     }
+    
     delete m_peach;
+}
+
+Peach* StudentWorld::getPeach()
+{
+    return m_peach;
+}
+
+bool StudentWorld::isBlockingObject(int x, int y)
+{
+    //iterate through vector of actors
+    //if no matching getX and getY, return false
+    //if match, if block or pipe, return true
+    vector<Actor*>:: iterator it;
+    while (it != m_actor.end())
+    {
+        if ((*it)->getX() == x && (*it)->getY() == y)
+        {
+            if ((*it)->isBlockOrPipe())
+                return true;
+            else
+                return false;
+        }
+        it++;
+    }
+    return false;
+}
+
+Actor* StudentWorld::getActorAt(int x, int y)
+{
+    for (int i = 0; i < m_actor.size(); i++)
+    {
+        if (m_actor[i]->getX() == x && m_actor[i]->getY() == y)
+            return m_actor[i];
+    }
+    return nullptr;
 }

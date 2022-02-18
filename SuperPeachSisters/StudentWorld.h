@@ -20,6 +20,9 @@ public:
   virtual int init();
   virtual int move();
   virtual void cleanUp();
+    Peach* getPeach();
+    bool isBlockingObject(int x, int y);
+    Actor* getActorAt(int x, int y);
 
 private:
     vector<Actor*> m_actor; //use vector to store pointers to all actors except Peach
