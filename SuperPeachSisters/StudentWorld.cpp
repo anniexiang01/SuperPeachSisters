@@ -163,7 +163,7 @@ bool StudentWorld::isBlockingObject(int x, int y)
     vector<Actor*>:: iterator it = m_actor.begin();
     while (it != m_actor.end())
     {
-        if ((*it)->getX() == x && (*it)->getY() == y)
+        if ((*it)->getX() == x && (*it)->getY() == y && isOverlapPeach(*it))
         {
             if ((*it)->isBlockOrPipe())
                 return true;
@@ -175,14 +175,22 @@ bool StudentWorld::isBlockingObject(int x, int y)
     return false;
 }
 
-Actor* StudentWorld::getActorAt(int x, int y)
+void StudentWorld::bonkActorAt(int x, int y)
 {
     for (int i = 0; i < m_actor.size(); i++)
     {
         if (m_actor[i]->getX() == x && m_actor[i]->getY() == y)
-            return m_actor[i];
+            m_actor[i]->bonk();
     }
-    return nullptr;
+}
+
+void StudentWorld::ifOverlapPeachBonk()
+{
+    for (int i = 0; i < m_actor.size(); i++)
+    {
+        if (isOverlapPeach(m_actor[i]))
+            m_actor[i]->bonk();
+    }
 }
 
 bool StudentWorld::isOverlapPeach(Actor* a)
@@ -190,12 +198,12 @@ bool StudentWorld::isOverlapPeach(Actor* a)
     int a_upper = a->getY()+SPRITE_HEIGHT-1;
     int a_lower = a->getY();
     int a_left = a->getX();
-    int a_right = a->getY()+SPRITE_WIDTH-1;
+    int a_right = a->getX()+SPRITE_WIDTH-1;
     
     int b_upper = m_peach->getY()+SPRITE_HEIGHT-1;
     int b_lower = m_peach->getY();
     int b_left = m_peach->getX();
-    int b_right = m_peach->getY()+SPRITE_WIDTH-1;
+    int b_right = m_peach->getX()+SPRITE_WIDTH-1;
     
     if ((a_upper >= b_lower && a_lower <= b_upper) || (a_right >= b_left && a_left <= b_right))
         return true;
@@ -221,4 +229,19 @@ void StudentWorld::setJump()
     increaseScore(75);
     m_peach->setJump();
     m_peach->setHealth(2);
+}
+
+void StudentWorld::addMushroom(int x, int y)
+{
+    m_actor.push_back(new Mushroom(this, IID_MUSHROOM, x, y, 0, 1, 1));
+}
+
+void StudentWorld::addStar(int x, int y)
+{
+    m_actor.push_back(new Star(this, IID_STAR, x, y, 0, 1, 1));
+}
+
+void StudentWorld::addFlower(int x, int y)
+{
+    m_actor.push_back(new Flower(this, IID_FLOWER, x, y, 0, 1, 1));
 }

@@ -69,9 +69,41 @@ void Peach::doSomething()
     if (time_to_recharge_before_next_fire > 0)
         time_to_recharge_before_next_fire--;
     
-    //if overlap, getActor->bonk  ////////////////////////////////////////////////////////////////////////////////////
+    //if overlap, bonkActor at
+    getWorld()->ifOverlapPeachBonk();
+    
     //jumping  ////////////////////////////////////////////////////////////////////////////////////
+    if (remaining_jump_distance > 0)
+    {
+        if (getWorld()->isBlockingObject(getX(), getY() + 4 + 4)) //extra +4 to prevent halfway overlap
+        {
+            getWorld()->bonkActorAt(getX(), getY() + 4);
+            remaining_jump_distance = 0;
+        }
+        else if (getWorld()->isBlockingObject(getX() + 4, getY() + 4 + 4))
+        {
+            getWorld()->bonkActorAt(getX() + 4, getY() + 4);
+            remaining_jump_distance = 0;
+        }
+        else if (getWorld()->isBlockingObject(getX() - 4, getY() + 4 + 4))
+        {
+            getWorld()->bonkActorAt(getX() - 4, getY() + 4);
+            remaining_jump_distance = 0;
+        }
+        else
+        {
+            moveTo(getX(), getY() + 4);
+            remaining_jump_distance--;
+        }
+    }
     //falling  ////////////////////////////////////////////////////////////////////////////////////
+    
+    else
+    {
+        if (!(getWorld()->isBlockingObject(getX(), getY() - SPRITE_HEIGHT + 1) || getWorld()->isBlockingObject(getX(), getY() - 1 - SPRITE_HEIGHT+1) || getWorld()->isBlockingObject(getX(), getY() - 2 - SPRITE_HEIGHT+1) || getWorld()->isBlockingObject(getX(), getY() - 3 - SPRITE_HEIGHT+1) || getWorld()->isBlockingObject(getX() + 4, getY() - SPRITE_HEIGHT + 1) || getWorld()->isBlockingObject(getX() + 4, getY() - 1 - SPRITE_HEIGHT+1) || getWorld()->isBlockingObject(getX() + 4, getY() - 2 - SPRITE_HEIGHT+1) || getWorld()->isBlockingObject(getX() + 4, getY() - 3 - SPRITE_HEIGHT+1)|| getWorld()->isBlockingObject(getX() - 4, getY() - SPRITE_HEIGHT + 1) || getWorld()->isBlockingObject(getX() - 4, getY() - 1 - SPRITE_HEIGHT+1) || getWorld()->isBlockingObject(getX() - 4, getY() - 2 - SPRITE_HEIGHT+1) || getWorld()->isBlockingObject(getX() - 4, getY() - 3 - SPRITE_HEIGHT+1)))
+            moveTo(getX(), getY() - 4);
+    }
+    
     
     //key
     int key;
@@ -81,22 +113,19 @@ void Peach::doSomething()
         {
             case KEY_PRESS_LEFT:
                 setDirection(180);
-                if (getWorld()->isBlockingObject(getX() - 4, getY()))
-                    getWorld()->getActorAt(getX() - 4, getY())->bonk();
+                if (getWorld()->isBlockingObject(getX() - 4 - 4, getY())) //extra -4 to prevent halfway overlap
+                    getWorld()->bonkActorAt(getX() - 4 - 4, getY());
                 else
                     moveTo(getX() - 4, getY());
                 break;
             case KEY_PRESS_RIGHT:
                 setDirection(0);
-                if (getWorld()->isBlockingObject(getX() + 4, getY()))
-                    getWorld()->getActorAt(getX() + 4, getY())->bonk();
+                if (getWorld()->isBlockingObject(getX() + 4 + 4, getY())) //extra +4 to prevent halfway overlap
+                    getWorld()->bonkActorAt(getX() + 4 + 4, getY());
                 else
                     moveTo(getX() + 4, getY());
                 break;
             case KEY_PRESS_SPACE:
-                //implement this  ////////////////////////////////////////////////////////////////////////////////////
-                break;
-            case KEY_PRESS_UP:
                 if (shootPower && time_to_recharge_before_next_fire == 0)
                 {
                     getWorld()->playSound(SOUND_PLAYER_FIRE);
@@ -107,6 +136,17 @@ void Peach::doSomething()
                      StudentWorld. The fireball must have its direction set to the
                      same direction that Peach was facing when she fired.*/
                 }
+                break;
+            case KEY_PRESS_UP:
+                if (getWorld()->isBlockingObject(getX(), getY() - 1 - SPRITE_HEIGHT + 1) || getWorld()->isBlockingObject(getX() + 4, getY() - 1 - SPRITE_HEIGHT + 1) || getWorld()->isBlockingObject(getX() - 4, getY() - 1 - SPRITE_HEIGHT + 1))
+                {
+                    if (jumpPower)
+                        remaining_jump_distance = 12;
+                    else
+                        remaining_jump_distance = 8;
+                    getWorld()->playSound(SOUND_PLAYER_JUMP);
+                }
+                    
                 break;
                 
         }
@@ -209,7 +249,12 @@ void Block::bonk()
     else
     {
         getWorld()->playSound(SOUND_POWERUP_APPEARS);
-        //new goodie x, y+8 ////////////////////////////////////////////////////////////////////////////////////
+        if (m_goodie == 1)
+            getWorld()->addMushroom(getX(), getY() + 8);
+        if (m_goodie == 2)
+            getWorld()->addFlower(getX(), getY() + 8);
+        if (m_goodie == 3)
+            getWorld()->addStar(getX(), getY() +8);
         m_goodie = 0;
     }
 }
@@ -224,7 +269,10 @@ bool Pipe::blocks()
     return true;
 }
 
-void Pipe::bonk(){}
+void Pipe::bonk()
+{
+    getWorld()->playSound(SOUND_PLAYER_BONK); //not sure if its supposed to but the example does i think
+}
 
 Goodie::Goodie(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
 {}
