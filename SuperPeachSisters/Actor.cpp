@@ -69,11 +69,11 @@ void Peach::doSomething()
     if (time_to_recharge_before_next_fire > 0)
         time_to_recharge_before_next_fire--;
     
-    //if overlap, getActor->bonk
-    //jumping
-    //falling
-    //key
+    //if overlap, getActor->bonk  ////////////////////////////////////////////////////////////////////////////////////
+    //jumping  ////////////////////////////////////////////////////////////////////////////////////
+    //falling  ////////////////////////////////////////////////////////////////////////////////////
     
+    //key
     int key;
     if (getWorld()->getKey(key))
     {
@@ -94,7 +94,7 @@ void Peach::doSomething()
                     moveTo(getX() + 4, getY());
                 break;
             case KEY_PRESS_SPACE:
-                //implement this
+                //implement this  ////////////////////////////////////////////////////////////////////////////////////
                 break;
             case KEY_PRESS_UP:
                 if (shootPower && time_to_recharge_before_next_fire == 0)
@@ -167,4 +167,137 @@ bool Peach::ifJump()
     return jumpPower;
 }
 
-//actors use getWorld()->getPeach()->bonk()
+void Peach::setStar(int ticks)
+{
+    starPower = true;
+    remaining_star_invincible = ticks;
+}
+
+void Peach::setShoot()
+{
+    shootPower = true;
+}
+
+void Peach::setJump()
+{
+    jumpPower = true;
+}
+
+void Peach::setHealth(int hit)
+{
+    m_health = hit;
+}
+
+Block::Block(int goodie, StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
+{
+    m_goodie = goodie;
+}
+
+void Block::doSomething(){}
+
+bool Block::blocks()
+{
+    return true;
+}
+
+void Block::bonk()
+{
+    if (m_goodie == 0)
+    {
+        getWorld()->playSound(SOUND_PLAYER_BONK);
+    }
+    else
+    {
+        getWorld()->playSound(SOUND_POWERUP_APPEARS);
+        //new goodie x, y+8 ////////////////////////////////////////////////////////////////////////////////////
+        m_goodie = 0;
+    }
+}
+
+Pipe::Pipe(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
+{}
+
+void Pipe::doSomething(){}
+
+bool Pipe::blocks()
+{
+    return true;
+}
+
+void Pipe::bonk(){}
+
+Goodie::Goodie(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
+{}
+
+void Goodie::doSomething()
+{
+    //if overlap with peach
+    if (getWorld()->isOverlapPeach(this))
+    {
+        setPower();
+        setDead();
+        getWorld()->playSound(SOUND_PLAYER_POWERUP);
+        return;
+    }
+    
+    //if not overlap with peach
+    else
+    {
+        if (!(getWorld()->isBlockingObject(getX(), getY() - 2)))
+            moveTo(getX(), getY() - 2);
+        if (getDirection() == 0)
+        {
+            if (getWorld()->isBlockingObject(getX() - 2, getY()))
+            {
+                setDirection(180);
+                return;
+            }
+            else
+                moveTo(getX() - 2, getY());
+        }
+        else
+        {
+            if (getWorld()->isBlockingObject(getX() + 2, getY()))
+            {
+                setDirection(0);
+                return;
+            }
+            else
+                moveTo(getX() + 2, getY());
+        }
+    }
+}
+
+void Goodie::bonk(){}
+
+bool Goodie::blocks()
+{
+    return false;
+}
+
+Star::Star(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Goodie(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+
+void Star::setPower()
+{
+    getWorld()->setStar();
+    return;
+}
+
+Mushroom::Mushroom(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Goodie(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+
+void Mushroom::setPower()
+{
+    getWorld()->setJump();
+    return;
+}
+
+Flower::Flower(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Goodie(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+
+void Flower::setPower()
+{
+    getWorld()->setShoot();
+    return;
+}

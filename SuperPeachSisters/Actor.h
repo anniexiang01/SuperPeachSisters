@@ -33,6 +33,12 @@ public:
     bool ifStar();
     bool ifShoot();
     bool ifJump();
+    
+    void setStar(int ticks);
+    void setShoot();
+    void setJump();
+    void setHealth(int hit);
+    
     bool ifFlag();
     bool ifMario();
     
@@ -48,6 +54,59 @@ private:
     bool gotMario;
     int time_to_recharge_before_next_fire;
     int remaining_jump_distance;
+};
+
+class Block: public Actor
+{
+public:
+    Block(int goodie, StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void doSomething();
+    virtual bool blocks();
+    virtual void bonk();
+private:
+    int m_goodie; // 0 for none, 1 mushroom (^), 2 flower (%), 3 star (*)
+    
+};
+
+class Pipe: public Actor
+{
+public:
+    Pipe(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void doSomething();
+    virtual bool blocks();
+    virtual void bonk();
+};
+
+class Goodie: public Actor
+{
+public:
+    Goodie(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void doSomething();
+    virtual bool blocks();
+    virtual void bonk();
+private:
+    virtual void setPower() = 0;
+};
+
+class Star: public Goodie
+{
+public:
+    Star(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void setPower();
+};
+
+class Mushroom: public Goodie
+{
+public:
+    Mushroom(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void setPower();
+};
+
+class Flower: public Goodie
+{
+public:
+    Flower(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void setPower();
 };
 
 

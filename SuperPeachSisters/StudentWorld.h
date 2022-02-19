@@ -20,9 +20,13 @@ public:
   virtual int init();
   virtual int move();
   virtual void cleanUp();
-    Peach* getPeach();
     bool isBlockingObject(int x, int y);
     Actor* getActorAt(int x, int y);
+    bool isOverlapPeach(Actor* a);
+    
+    void setStar();
+    void setShoot();
+    void setJump();
 
 private:
     vector<Actor*> m_actor; //use vector to store pointers to all actors except Peach

@@ -59,14 +59,19 @@ int StudentWorld::init() //construct representation of current level (populate w
                     case Level::piranha:
                         break;
                     case Level::block:
+                        m_actor.push_back(new Block(0, this, IID_BLOCK, gx, gy, 0, 2, 1));
                         break;
                     case Level::star_goodie_block:
+                        m_actor.push_back(new Block(3, this, IID_BLOCK, gx, gy, 0, 2, 1));
                         break;
                     case Level::mushroom_goodie_block:
+                        m_actor.push_back(new Block(1, this, IID_BLOCK, gx, gy, 0, 2, 1));
                         break;
                     case Level::flower_goodie_block:
+                        m_actor.push_back(new Block(2, this, IID_BLOCK, gx, gy, 0, 2, 1)); 
                         break;
                     case Level::pipe:
+                        m_actor.push_back(new Pipe(this, IID_PIPE, gx, gy, 0, 2, 1));
                         break;
                     case Level::flag:
                         break;
@@ -140,7 +145,7 @@ int StudentWorld::move()
 
 void StudentWorld::cleanUp()
 {
-    vector<Actor*>:: iterator it;
+    vector<Actor*>:: iterator it = m_actor.begin();
     while (it != m_actor.end()) //calls delete on all Actors, vector still have pointers but they point to nothing
     {
         delete *it;
@@ -150,17 +155,12 @@ void StudentWorld::cleanUp()
     delete m_peach;
 }
 
-Peach* StudentWorld::getPeach()
-{
-    return m_peach;
-}
-
 bool StudentWorld::isBlockingObject(int x, int y)
 {
     //iterate through vector of actors
     //if no matching getX and getY, return false
     //if match, if block or pipe, return true
-    vector<Actor*>:: iterator it;
+    vector<Actor*>:: iterator it = m_actor.begin();
     while (it != m_actor.end())
     {
         if ((*it)->getX() == x && (*it)->getY() == y)
@@ -183,4 +183,42 @@ Actor* StudentWorld::getActorAt(int x, int y)
             return m_actor[i];
     }
     return nullptr;
+}
+
+bool StudentWorld::isOverlapPeach(Actor* a)
+{
+    int a_upper = a->getY()+SPRITE_HEIGHT-1;
+    int a_lower = a->getY();
+    int a_left = a->getX();
+    int a_right = a->getY()+SPRITE_WIDTH-1;
+    
+    int b_upper = m_peach->getY()+SPRITE_HEIGHT-1;
+    int b_lower = m_peach->getY();
+    int b_left = m_peach->getX();
+    int b_right = m_peach->getY()+SPRITE_WIDTH-1;
+    
+    if ((a_upper >= b_lower && a_lower <= b_upper) || (a_right >= b_left && a_left <= b_right))
+        return true;
+    else
+        return false;
+}
+
+void StudentWorld::setStar()
+{
+    increaseScore(100);
+    m_peach->setStar(150);
+}
+
+void StudentWorld::setShoot()
+{
+    increaseScore(50);
+    m_peach->setShoot();
+    m_peach->setHealth(2);
+}
+
+void StudentWorld::setJump()
+{
+    increaseScore(75);
+    m_peach->setJump();
+    m_peach->setHealth(2);
 }
