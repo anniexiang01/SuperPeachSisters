@@ -21,6 +21,8 @@ public:
   virtual int move();
   virtual void cleanUp();
     bool isBlockingObject(int x, int y);
+    bool isOverlap(Actor* a, Actor* b);
+    bool isOverlap(Actor* a, int x, int y);
     bool isOverlapPeach(Actor* a);
     
     void setStar();

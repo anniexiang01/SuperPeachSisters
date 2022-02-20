@@ -59,16 +59,16 @@ int StudentWorld::init() //construct representation of current level (populate w
                     case Level::piranha:
                         break;
                     case Level::block:
-                        m_actor.push_back(new Block(0, this, IID_BLOCK, gx, gy, 0, 2, 1));
+                        m_actor.push_back(new Block(this, IID_BLOCK, gx, gy, 0, 2, 1));
                         break;
                     case Level::star_goodie_block:
-                        m_actor.push_back(new Block(3, this, IID_BLOCK, gx, gy, 0, 2, 1));
+                        m_actor.push_back(new starBlock(this, IID_BLOCK, gx, gy, 0, 2, 1)); //change to special blocks, polymorphism is not working for me alskdj
                         break;
                     case Level::mushroom_goodie_block:
-                        m_actor.push_back(new Block(1, this, IID_BLOCK, gx, gy, 0, 2, 1));
+                        m_actor.push_back(new mushroomBlock(this, IID_BLOCK, gx, gy, 0, 2, 1));
                         break;
                     case Level::flower_goodie_block:
-                        m_actor.push_back(new Block(2, this, IID_BLOCK, gx, gy, 0, 2, 1)); 
+                        m_actor.push_back(new flowerBlock(this, IID_BLOCK, gx, gy, 0, 2, 1));
                         break;
                     case Level::pipe:
                         m_actor.push_back(new Pipe(this, IID_PIPE, gx, gy, 0, 2, 1));
@@ -163,7 +163,7 @@ bool StudentWorld::isBlockingObject(int x, int y)
     vector<Actor*>:: iterator it = m_actor.begin();
     while (it != m_actor.end())
     {
-        if ((*it)->getX() == x && (*it)->getY() == y && isOverlapPeach(*it))
+        if (/*(*it)->getX() == x && (*it)->getY() == y && */isOverlap(*it, x, y))
         {
             if ((*it)->isBlockOrPipe())
                 return true;
@@ -193,22 +193,43 @@ void StudentWorld::ifOverlapPeachBonk()
     }
 }
 
-bool StudentWorld::isOverlapPeach(Actor* a)
+bool StudentWorld::isOverlap(Actor* a, Actor* b)
+{
+    int a_upper = a->getY() + SPRITE_HEIGHT - 1;
+    int a_lower = a->getY();
+    int a_left = a->getX();
+    int a_right = a->getX() + SPRITE_WIDTH - 1;
+    
+    int b_upper = b->getY() + SPRITE_HEIGHT - 1;
+    int b_lower = b->getY();
+    int b_left = b->getX();
+    int b_right = b->getX() + SPRITE_WIDTH - 1;
+    
+    if (a_upper < b_lower || a_lower > b_upper || a_left > b_right || a_right < b_left)
+        return false;
+    return true;
+}
+
+bool StudentWorld::isOverlap(Actor* a, int x, int y)
 {
     int a_upper = a->getY()+SPRITE_HEIGHT-1;
     int a_lower = a->getY();
     int a_left = a->getX();
     int a_right = a->getX()+SPRITE_WIDTH-1;
     
-    int b_upper = m_peach->getY()+SPRITE_HEIGHT-1;
-    int b_lower = m_peach->getY();
-    int b_left = m_peach->getX();
-    int b_right = m_peach->getX()+SPRITE_WIDTH-1;
+    int b_upper = y+SPRITE_HEIGHT-1;
+    int b_lower = y;
+    int b_left = x;
+    int b_right = x+SPRITE_WIDTH-1;
     
-    if ((a_upper >= b_lower && a_lower <= b_upper) || (a_right >= b_left && a_left <= b_right))
-        return true;
-    else
+    if (a_upper < b_lower || a_lower > b_upper || a_left > b_right || a_right < b_left)
         return false;
+    return true;
+}
+
+bool StudentWorld::isOverlapPeach(Actor* a)
+{
+    return isOverlap(a, m_peach);
 }
 
 void StudentWorld::setStar()

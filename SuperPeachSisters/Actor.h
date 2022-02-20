@@ -59,13 +59,35 @@ private:
 class Block: public Actor
 {
 public:
-    Block(int goodie, StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    Block(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
     virtual void doSomething();
     virtual bool blocks();
     virtual void bonk();
+    void dropItem();
+    int getItem();
 private:
-    int m_goodie; // 0 for none, 1 mushroom (^), 2 flower (%), 3 star (*)
-    
+    int m_item;
+};
+
+class mushroomBlock: public Block
+{
+public:
+    mushroomBlock(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void bonk();
+};
+
+class flowerBlock: public Block
+{
+public:
+    flowerBlock(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void bonk();
+};
+
+class starBlock: public Block
+{
+public:
+    starBlock(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void bonk();
 };
 
 class Pipe: public Actor
