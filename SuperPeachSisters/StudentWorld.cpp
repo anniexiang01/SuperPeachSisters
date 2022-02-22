@@ -17,11 +17,12 @@ GameWorld* createStudentWorld(string assetPath)
 
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
-{
-}
+{}
 
 int StudentWorld::init() //construct representation of current level (populate with objects)
 {
+    flag = false;
+    mario = false;
     Level lev(assetPath());
     
     ostringstream oss; //use string streams to code level file through getLevel()
@@ -74,8 +75,10 @@ int StudentWorld::init() //construct representation of current level (populate w
                         m_actor.push_back(new Pipe(this, IID_PIPE, gx, gy, 0, 2, 1));
                         break;
                     case Level::flag:
+                        m_actor.push_back(new Flag(this, IID_FLAG, gx, gy, 0, 1, 1));
                         break;
                     case Level::mario:
+                        m_actor.push_back(new Mario(this, IID_MARIO, gx, gy, 0, 1, 1));
                         break;
                         
                 }
@@ -104,13 +107,13 @@ int StudentWorld::move()
     if (!(m_peach->isAlive()))
         return GWSTATUS_PLAYER_DIED;
     
-    if(m_peach->ifFlag())
+    if(flag)
     {
         playSound(SOUND_FINISHED_LEVEL);
         return GWSTATUS_FINISHED_LEVEL;
     }
     
-    if(m_peach->ifMario())
+    if(mario)
     {
         playSound(SOUND_GAME_OVER);
         return GWSTATUS_PLAYER_WON;
@@ -151,7 +154,7 @@ void StudentWorld::cleanUp()
         delete *it;
         it++;
     }
-    
+    m_actor.clear();
     delete m_peach;
 }
 
@@ -251,15 +254,27 @@ void StudentWorld::setJump()
 
 void StudentWorld::addMushroom(int x, int y)
 {
-    m_actor.push_back(new Mushroom(this, IID_MUSHROOM, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 0, 1, 1));
+    m_actor.push_back(new Mushroom(this, IID_MUSHROOM, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 180, 1, 1));
 }
 
 void StudentWorld::addStar(int x, int y)
 {
-    m_actor.push_back(new Star(this, IID_STAR, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 0, 1, 1));
+    m_actor.push_back(new Star(this, IID_STAR, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 180, 1, 1));
 }
 
 void StudentWorld::addFlower(int x, int y)
 {
-    m_actor.push_back(new Flower(this, IID_FLOWER, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 0, 1, 1));
+    m_actor.push_back(new Flower(this, IID_FLOWER, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 180, 1, 1));
+}
+
+void StudentWorld::nextLevel()
+{
+    increaseScore(1000);
+    flag = true;
+}
+
+void StudentWorld::endGame()
+{
+    increaseScore(1000);
+    mario = true;
 }

@@ -39,9 +39,6 @@ public:
     void setJump();
     void setHealth(int hit);
     
-    bool ifFlag();
-    bool ifMario();
-    
 private:
     int m_health;
     bool starPower;
@@ -50,8 +47,6 @@ private:
     int remaining_star_invincible; //in ticks
     int remaining_temp_invincible;
     bool tempInvincible;
-    bool gotFlag;
-    bool gotMario;
     int time_to_recharge_before_next_fire;
     int remaining_jump_distance;
 };
@@ -131,6 +126,29 @@ public:
     virtual void setPower();
 };
 
+class Portal: public Actor
+{
+public:
+    Portal(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void doSomething();
+    virtual bool blocks();
+    virtual void bonk();
+private:
+    virtual void goPortal() = 0;
+};
 
+class Flag: public Portal
+{
+public:
+    Flag(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void goPortal();
+};
+
+class Mario: public Portal
+{
+public:
+    Mario(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void goPortal();
+};
 
 #endif // ACTOR_H_

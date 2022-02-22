@@ -42,8 +42,6 @@ Peach::Peach(StudentWorld* swp, int imageID, int startX, int startY, int startDi
     starPower = false;
     shootPower = false;
     jumpPower = false;
-    gotFlag = false;
-    gotMario = false;
     time_to_recharge_before_next_fire = 0;
     remaining_jump_distance = 0;
 }
@@ -170,16 +168,6 @@ void Peach::bonk()
 bool Peach::blocks()
 {
     return false;
-}
-
-bool Peach::ifFlag()
-{
-    return gotFlag;
-}
-
-bool Peach::ifMario()
-{
-    return gotMario;
 }
 
 bool Peach::ifStar()
@@ -386,4 +374,42 @@ void Flower::setPower()
 {
     getWorld()->setShoot();
     return;
+}
+
+Portal::Portal(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
+{}
+
+void Portal::bonk(){}
+
+bool Portal::blocks()
+{
+    return false;
+}
+
+void Portal::doSomething()
+{
+    if (!isAlive())
+        return;
+    
+    if (getWorld()->isOverlapPeach(this))
+    {
+        goPortal();
+        setDead();
+    }
+}
+
+Flag::Flag(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Portal(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+
+void Flag::goPortal()
+{
+    getWorld()->nextLevel();
+}
+
+Mario::Mario(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Portal(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+
+void Mario::goPortal()
+{
+    getWorld()->endGame();
 }

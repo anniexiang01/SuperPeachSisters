@@ -35,10 +35,15 @@ public:
     
     void bonkActorAt(int x, int y);
     void ifOverlapPeachBonk();
+    
+    void nextLevel();
+    void endGame();
 
 private:
     vector<Actor*> m_actor; //use vector to store pointers to all actors except Peach
     Peach* m_peach; //pointer to Peach
+    bool flag;
+    bool mario;
 };
 
 #endif // STUDENTWORLD_H_
