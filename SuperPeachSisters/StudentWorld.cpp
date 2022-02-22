@@ -62,7 +62,7 @@ int StudentWorld::init() //construct representation of current level (populate w
                         m_actor.push_back(new Block(this, IID_BLOCK, gx, gy, 0, 2, 1));
                         break;
                     case Level::star_goodie_block:
-                        m_actor.push_back(new starBlock(this, IID_BLOCK, gx, gy, 0, 2, 1)); //change to special blocks, polymorphism is not working for me alskdj
+                        m_actor.push_back(new starBlock(this, IID_BLOCK, gx, gy, 0, 2, 1));
                         break;
                     case Level::mushroom_goodie_block:
                         m_actor.push_back(new mushroomBlock(this, IID_BLOCK, gx, gy, 0, 2, 1));
@@ -88,8 +88,7 @@ int StudentWorld::init() //construct representation of current level (populate w
 
 int StudentWorld::move()
 {
-    // This code is here merely to allow the game to build, run, and terminate after you hit enter.
-    // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
+    
     
     vector<Actor*>:: iterator it;
     it = m_actor.begin();
@@ -117,8 +116,6 @@ int StudentWorld::move()
         return GWSTATUS_PLAYER_WON;
     }
     
-    //add actors when necessary (when Peach bonked a block to release goodie)
-    
     
     //delete actors if m_status == false
     for (it = m_actor.begin(); it != m_actor.end();)
@@ -126,7 +123,10 @@ int StudentWorld::move()
         if ((*it)->isAlive())
             it++;
         else
+        {
+            delete *it;
             it = m_actor.erase(it);
+        }
     }
     
     
@@ -157,13 +157,10 @@ void StudentWorld::cleanUp()
 
 bool StudentWorld::isBlockingObject(int x, int y)
 {
-    //iterate through vector of actors
-    //if no matching getX and getY, return false
-    //if match, if block or pipe, return true
     vector<Actor*>:: iterator it = m_actor.begin();
     while (it != m_actor.end())
     {
-        if (/*(*it)->getX() == x && (*it)->getY() == y && */isOverlap(*it, x, y))
+        if (isOverlap(*it, x, y))
         {
             if ((*it)->isBlockOrPipe())
                 return true;
@@ -179,7 +176,7 @@ void StudentWorld::bonkActorAt(int x, int y)
 {
     for (int i = 0; i < m_actor.size(); i++)
     {
-        if (m_actor[i]->getX() == x && m_actor[i]->getY() == y)
+        if (isOverlap(m_actor[i], x, y))
             m_actor[i]->bonk();
     }
 }
@@ -254,15 +251,15 @@ void StudentWorld::setJump()
 
 void StudentWorld::addMushroom(int x, int y)
 {
-    m_actor.push_back(new Mushroom(this, IID_MUSHROOM, x, y, 0, 1, 1));
+    m_actor.push_back(new Mushroom(this, IID_MUSHROOM, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 0, 1, 1));
 }
 
 void StudentWorld::addStar(int x, int y)
 {
-    m_actor.push_back(new Star(this, IID_STAR, x, y, 0, 1, 1));
+    m_actor.push_back(new Star(this, IID_STAR, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 0, 1, 1));
 }
 
 void StudentWorld::addFlower(int x, int y)
 {
-    m_actor.push_back(new Flower(this, IID_FLOWER, x, y, 0, 1, 1));
+    m_actor.push_back(new Flower(this, IID_FLOWER, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, 0, 1, 1));
 }

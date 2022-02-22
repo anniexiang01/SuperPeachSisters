@@ -72,7 +72,7 @@ void Peach::doSomething()
     //if overlap, bonkActor at
     getWorld()->ifOverlapPeachBonk();
     
-    //jumping  ////////////////////////////////////////////////////////////////////////////////////
+    //jumping
     if (remaining_jump_distance > 0)
     {
         if (getWorld()->isBlockingObject(getX(), getY() + 4))
@@ -86,7 +86,7 @@ void Peach::doSomething()
             remaining_jump_distance--;
         }
     }
-    //falling  ////////////////////////////////////////////////////////////////////////////////////
+    //falling
     
     else
     {
@@ -262,6 +262,10 @@ void mushroomBlock::bonk()
         getWorld()->addMushroom(getX(), getY() + 8);
         dropItem();
     }
+    else
+    {
+        getWorld()->playSound(SOUND_PLAYER_BONK);
+    }
 }
 
 void flowerBlock::bonk()
@@ -272,6 +276,10 @@ void flowerBlock::bonk()
         getWorld()->addFlower(getX(), getY() + 8);
         dropItem();
     }
+    else
+    {
+        getWorld()->playSound(SOUND_PLAYER_BONK);
+    }
 }
 
 void starBlock::bonk()
@@ -281,6 +289,10 @@ void starBlock::bonk()
         getWorld()->playSound(SOUND_PLAYER_POWERUP);
         getWorld()->addStar(getX(), getY() + 8);
         dropItem();
+    }
+    else
+    {
+        getWorld()->playSound(SOUND_PLAYER_BONK);
     }
 }
 
