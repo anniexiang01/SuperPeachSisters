@@ -413,3 +413,76 @@ void Mario::goPortal()
 {
     getWorld()->endGame();
 }
+
+Enemy::Enemy(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
+{}
+
+bool Enemy::blocks()
+{
+    return false;
+}
+
+void Enemy::doSomething()
+{
+    if (!isAlive())
+        return;
+    
+    if (getWorld()->isOverlapPeach(this))
+    {
+        getWorld()->bonkPeach();
+        return;
+    }
+    
+    else
+    {
+        if (getDirection() == 0)
+        {
+            if (getWorld()->isBlockingObject(getX() - 1, getY()))
+            {
+                setDirection(180);
+                return;
+            }
+            else if (getWorld()->isBlockingObject(getX() - 1 - SPRITE_WIDTH + 1, getY() - 1)) // need to make sure it doesn't go partly off the edge
+                moveTo(getX() - 1, getY());
+            else
+            {
+                setDirection(180);
+                return;
+            }
+        }
+        else
+        {
+            if (getWorld()->isBlockingObject(getX() + 1, getY()))
+            {
+                setDirection(0);
+                return;
+            }
+            else if (getWorld()->isBlockingObject(getX() + 1 + SPRITE_WIDTH - 1, getY() - 1)) // need to make sure it doesn't go partly off the edge
+                moveTo(getX() + 1, getY());
+            else
+            {
+                setDirection(0);
+                return;
+            }
+        }
+    }
+    
+}
+
+void Enemy::bonk()
+{
+    if (!getWorld()->isOverlapPeach(this))
+        return;
+    
+    if (getWorld()->ifPeachStar()){
+        getWorld()->playSound(SOUND_PLAYER_KICK);
+        getWorld()->increaseScore(100);
+        setDead();
+    }
+}
+
+Goomba::Goomba(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Enemy(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+
+Koopa::Koopa(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Enemy(swp, imageID, startX, startY, startDirection, depth, size)
+{}

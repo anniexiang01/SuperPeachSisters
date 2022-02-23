@@ -25,6 +25,8 @@ public:
     bool isOverlap(Actor* a, int x, int y);
     bool isOverlapPeach(Actor* a);
     
+    bool ifPeachStar();
+    
     void setStar();
     void setShoot();
     void setJump();
@@ -35,6 +37,7 @@ public:
     
     void bonkActorAt(int x, int y);
     void ifOverlapPeachBonk();
+    void bonkPeach();
     
     void nextLevel();
     void endGame();

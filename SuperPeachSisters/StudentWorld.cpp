@@ -54,8 +54,16 @@ int StudentWorld::init() //construct representation of current level (populate w
                         m_peach = new Peach(this, IID_PEACH, gx, gy, 0, 0, 1.0);
                         break;
                     case Level::goomba:
+                        if (randInt(0, 1) == 0)
+                            m_actor.push_back(new Goomba(this, IID_GOOMBA, gx, gy, 0, 1, 0));
+                        else
+                            m_actor.push_back(new Goomba(this, IID_GOOMBA, gx, gy, 180, 1, 0));
                         break;
                     case Level::koopa:
+                        if (randInt(0, 1) == 0)
+                            m_actor.push_back(new Koopa(this, IID_KOOPA, gx, gy, 0, 1, 0));
+                        else
+                            m_actor.push_back(new Koopa(this, IID_KOOPA, gx, gy, 180, 1, 0));
                         break;
                     case Level::piranha:
                         break;
@@ -104,8 +112,10 @@ int StudentWorld::move()
     
     m_peach->doSomething();
     
-    if (!(m_peach->isAlive()))
+    if (!(m_peach->isAlive())){
+        decLives(); //not in spec but should be right?
         return GWSTATUS_PLAYER_DIED;
+    }
     
     if(flag)
     {
@@ -167,8 +177,6 @@ bool StudentWorld::isBlockingObject(int x, int y)
         {
             if ((*it)->isBlockOrPipe())
                 return true;
-            else
-                return false;
         }
         it++;
     }
@@ -191,6 +199,11 @@ void StudentWorld::ifOverlapPeachBonk()
         if (isOverlapPeach(m_actor[i]))
             m_actor[i]->bonk();
     }
+}
+
+void StudentWorld::bonkPeach()
+{
+    m_peach->bonk();
 }
 
 bool StudentWorld::isOverlap(Actor* a, Actor* b)
@@ -230,6 +243,11 @@ bool StudentWorld::isOverlap(Actor* a, int x, int y)
 bool StudentWorld::isOverlapPeach(Actor* a)
 {
     return isOverlap(a, m_peach);
+}
+
+bool StudentWorld::ifPeachStar()
+{
+    return m_peach->ifStar();
 }
 
 void StudentWorld::setStar()

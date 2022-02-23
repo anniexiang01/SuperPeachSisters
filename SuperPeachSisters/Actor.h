@@ -151,4 +151,28 @@ public:
     virtual void goPortal();
 };
 
+class Enemy: public Actor
+{
+public:
+    Enemy(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void doSomething();
+    virtual bool blocks();
+    virtual void bonk();
+    //virtual void damage();
+};
+
+class Goomba: public Enemy
+{
+public:
+    Goomba(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    
+};
+
+class Koopa: public Enemy
+{
+public:
+    Koopa(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    
+};
+
 #endif // ACTOR_H_
