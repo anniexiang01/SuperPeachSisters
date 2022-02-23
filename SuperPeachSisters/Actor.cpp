@@ -33,6 +33,8 @@ bool Actor::isBlockOrPipe()
         return false;
 }
 
+void Actor::damage(){}
+
 Peach::Peach(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
 {
     m_health = 1;
@@ -84,8 +86,8 @@ void Peach::doSomething()
             remaining_jump_distance--;
         }
     }
-    //falling
     
+    //falling
     else
     {
         if (!(getWorld()->isBlockingObject(getX(), getY()) || getWorld()->isBlockingObject(getX(), getY() - 1 ) || getWorld()->isBlockingObject(getX(), getY() - 2) || getWorld()->isBlockingObject(getX(), getY() - 3)))
@@ -118,11 +120,10 @@ void Peach::doSomething()
                 {
                     getWorld()->playSound(SOUND_PLAYER_FIRE);
                     time_to_recharge_before_next_fire = 8;
-                    /*Determine the x,y position directly in front of Peach that is
-                     4 pixels away in the direction she’s facing.
-                     Introduce a new fireball object at this location into your
-                     StudentWorld. The fireball must have its direction set to the
-                     same direction that Peach was facing when she fired.*/
+                    if (getDirection() == 0)
+                        getWorld()->addPeachFire(getX() - 4, getY(), 0);
+                    else
+                        getWorld()->addPeachFire(getX() + 4, getY(), 180);
                 }
                 break;
             case KEY_PRESS_UP:
@@ -163,6 +164,11 @@ void Peach::bonk()
             return;
         }
     }
+}
+
+void Peach::damage()
+{
+    bonk();
 }
 
 bool Peach::blocks()
@@ -469,6 +475,8 @@ void Enemy::doSomething()
     
 }
 
+void Enemy::postDeath(){}
+
 void Enemy::bonk()
 {
     if (!getWorld()->isOverlapPeach(this))
@@ -477,8 +485,15 @@ void Enemy::bonk()
     if (getWorld()->ifPeachStar()){
         getWorld()->playSound(SOUND_PLAYER_KICK);
         getWorld()->increaseScore(100);
+        postDeath();
         setDead();
     }
+}
+
+void Enemy::damage()
+{
+    getWorld()->increaseScore(100);
+    setDead();
 }
 
 Goomba::Goomba(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Enemy(swp, imageID, startX, startY, startDirection, depth, size)
@@ -486,3 +501,123 @@ Goomba::Goomba(StudentWorld* swp, int imageID, int startX, int startY, int start
 
 Koopa::Koopa(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Enemy(swp, imageID, startX, startY, startDirection, depth, size)
 {}
+
+void Koopa::postDeath()
+{
+    getWorld()->addShell(getX(), getY(), getDirection());
+}
+
+Piranha::Piranha(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Enemy(swp, imageID, startX, startY, startDirection, depth, size)
+{
+    firing_delay = 0;
+}
+
+void Piranha::doSomething()
+{
+    if (!isAlive())
+        return;
+    
+    increaseAnimationNumber();
+    
+    if (getWorld()->isOverlapPeach(this))
+    {
+        getWorld()->bonkPeach();
+        return;
+    }
+    
+    else
+    {
+        if (!getWorld()->ifPeachSameLevel(this))
+            return;
+        else
+        {
+            if (getWorld()->ifPeachLeft(this))
+                setDirection(180); //i know this seems backwards but it seems like how it works?
+            else
+                setDirection(0);
+            
+            if (firing_delay > 0){
+                firing_delay--;
+                return;
+            }
+            else
+            {
+                if (getWorld()->ifPeachInRange(this))
+                {
+                    getWorld()->addPiranhaFire(getX(), getY(), getDirection());
+                    getWorld()->playSound(IID_PIRANHA_FIRE);
+                    firing_delay = 40;
+                }
+            }
+        }
+    }
+}
+
+Projectile::Projectile(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
+{}
+
+void Projectile::bonk(){}
+
+bool Projectile::blocks()
+{
+    return false;
+}
+
+void Projectile::doSomething()
+{
+    tryDamage();
+    
+    if (!getWorld()->isBlockingObject(getX(), getY() - 2))
+    {
+        moveTo(getX(), getY() - 2);
+    }
+    
+    if (getDirection() == 0)
+    {
+        if (getWorld()->isBlockingObject(getX() - 2, getY()))
+        {
+            setDead();
+            return;
+        }
+        moveTo(getX() - 2, getY());
+    }
+    else
+    {
+        if (getWorld()->isBlockingObject(getX() + 2, getY()))
+        {
+            setDead();
+            return;
+        }
+        moveTo(getX() + 2, getY());
+    }
+}
+
+
+void Projectile::tryDamage()
+{
+    if (getWorld()->damageActorAt(getX(), getY()))
+    {
+        setDead();
+        return;
+    }
+}
+
+PiranhaFire::PiranhaFire(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Projectile(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+
+void PiranhaFire::tryDamage()
+{
+    if (getWorld()->isOverlapPeach(this))
+    {
+        getWorld()->damagePeach();
+        setDead();
+        return;
+    }
+}
+
+PeachFire::PeachFire(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Projectile(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+
+Shell::Shell(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Projectile(swp, imageID, startX, startY, startDirection, depth, size)
+{}
+

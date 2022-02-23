@@ -26,6 +26,12 @@ public:
     bool isOverlapPeach(Actor* a);
     
     bool ifPeachStar();
+    bool ifPeachSameLevel(Actor* a);
+    bool ifPeachLeft(Actor* a);
+    bool ifPeachInRange(Actor* a);
+    
+    void damagePeach();
+    bool damageActorAt(int x, int y);
     
     void setStar();
     void setShoot();
@@ -41,6 +47,10 @@ public:
     
     void nextLevel();
     void endGame();
+    
+    void addPiranhaFire(int x, int y, int dir);
+    void addPeachFire(int x, int y, int dir);
+    void addShell(int x, int y, int dir);
 
 private:
     vector<Actor*> m_actor; //use vector to store pointers to all actors except Peach

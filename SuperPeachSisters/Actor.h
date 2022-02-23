@@ -18,6 +18,7 @@ public:
     bool isBlockOrPipe();
     virtual bool blocks() = 0;
     virtual void bonk() = 0;
+    virtual void damage();
 private:
     bool m_status;
     StudentWorld* m_world;
@@ -30,6 +31,7 @@ public:
     virtual void doSomething();
     virtual bool blocks();
     virtual void bonk();
+    virtual void damage();
     bool ifStar();
     bool ifShoot();
     bool ifJump();
@@ -158,7 +160,8 @@ public:
     virtual void doSomething();
     virtual bool blocks();
     virtual void bonk();
-    //virtual void damage();
+    virtual void damage();
+    virtual void postDeath();
 };
 
 class Goomba: public Enemy
@@ -172,7 +175,46 @@ class Koopa: public Enemy
 {
 public:
     Koopa(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
-    
+    void postDeath();
+};
+
+class Piranha: public Enemy
+{
+public:
+    Piranha(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void doSomething();
+private:
+    int firing_delay;
+};
+
+class Projectile: public Actor
+{
+public:
+    Projectile(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    virtual void doSomething();
+    virtual bool blocks();
+    virtual void bonk();
+private:
+    virtual void tryDamage();
+};
+
+class PiranhaFire: public Projectile
+{
+public:
+    PiranhaFire(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+    void tryDamage();
+};
+
+class PeachFire: public Projectile
+{
+public:
+    PeachFire(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
+};
+
+class Shell: public Projectile
+{
+public:
+    Shell(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
 };
 
 #endif // ACTOR_H_

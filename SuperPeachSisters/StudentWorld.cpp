@@ -66,6 +66,10 @@ int StudentWorld::init() //construct representation of current level (populate w
                             m_actor.push_back(new Koopa(this, IID_KOOPA, gx, gy, 180, 1, 0));
                         break;
                     case Level::piranha:
+                        if (randInt(0, 1) == 0)
+                            m_actor.push_back(new Piranha(this, IID_PIRANHA, gx, gy, 0, 1, 0));
+                        else
+                            m_actor.push_back(new Piranha(this, IID_PIRANHA, gx, gy, 180, 1, 0));
                         break;
                     case Level::block:
                         m_actor.push_back(new Block(this, IID_BLOCK, gx, gy, 0, 2, 1));
@@ -192,6 +196,23 @@ void StudentWorld::bonkActorAt(int x, int y)
     }
 }
 
+void StudentWorld::damagePeach()
+{
+    m_peach->damage();
+}
+
+bool StudentWorld::damageActorAt(int x, int y)
+{
+    for (int i = 0; i < m_actor.size(); i++)
+    {
+        if (isOverlap(m_actor[i], x, y)){
+            m_actor[i]->damage();
+            return true;
+        }
+    }
+    return false;
+}
+
 void StudentWorld::ifOverlapPeachBonk()
 {
     for (int i = 0; i < m_actor.size(); i++)
@@ -250,6 +271,37 @@ bool StudentWorld::ifPeachStar()
     return m_peach->ifStar();
 }
 
+bool StudentWorld::ifPeachSameLevel(Actor* a)
+{
+    int lower = a->getY() - (1.5*SPRITE_HEIGHT);
+    int upper = a->getY() + (1.5*SPRITE_HEIGHT);
+    if (m_peach->getY() <= upper && m_peach->getY() >= lower)
+        return true;
+    else
+        return false;
+}
+
+bool StudentWorld::ifPeachLeft(Actor* a)
+{
+    if (a->getX() > m_peach->getX())
+        return true;
+    else
+        return false;
+}
+
+bool StudentWorld::ifPeachInRange(Actor* a)
+{
+    int distance;
+    if (ifPeachLeft(a))
+        distance = a->getX() - m_peach->getX();
+    else
+        distance = m_peach->getX() - a->getX();
+    
+    if (distance < 8*SPRITE_WIDTH)
+        return true;
+    return false;
+}
+
 void StudentWorld::setStar()
 {
     increaseScore(100);
@@ -295,4 +347,19 @@ void StudentWorld::endGame()
 {
     increaseScore(1000);
     mario = true;
+}
+
+void StudentWorld::addPiranhaFire(int x, int y, int dir)
+{
+    m_actor.push_back(new PiranhaFire(this, IID_PIRANHA_FIRE, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
+}
+
+void StudentWorld::addPeachFire(int x, int y, int dir)
+{
+    m_actor.push_back(new Star(this, IID_PEACH_FIRE, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
+}
+
+void StudentWorld::addShell(int x, int y, int dir)
+{
+    m_actor.push_back(new Flower(this, IID_SHELL, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
 }
