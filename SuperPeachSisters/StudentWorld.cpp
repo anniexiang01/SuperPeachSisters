@@ -109,7 +109,7 @@ int StudentWorld::move()
     it = m_actor.begin();
     while (it != m_actor.end()) //all actors do something
     {
-        if ((*it)->isAlive())
+        if ((*it)->isAlive()) //iterator becomes unvalid when fireball hits koopa (bc the shell is added in the same tick?)
             (*it)->doSomething();
         it++;
     }
@@ -205,9 +205,10 @@ bool StudentWorld::damageActorAt(int x, int y)
 {
     for (int i = 0; i < m_actor.size(); i++)
     {
-        if (isOverlap(m_actor[i], x, y)){
-            m_actor[i]->damage();
-            return true;
+        if (isOverlap(m_actor[i], x, y))
+        {
+            if (m_actor[i]->damage())
+                return true;
         }
     }
     return false;
@@ -297,6 +298,9 @@ bool StudentWorld::ifPeachInRange(Actor* a)
     else
         distance = m_peach->getX() - a->getX();
     
+    if (distance < 0)
+        distance *= -1;
+    
     if (distance < 8*SPRITE_WIDTH)
         return true;
     return false;
@@ -356,10 +360,10 @@ void StudentWorld::addPiranhaFire(int x, int y, int dir)
 
 void StudentWorld::addPeachFire(int x, int y, int dir)
 {
-    m_actor.push_back(new Star(this, IID_PEACH_FIRE, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
+    m_actor.push_back(new PeachFire(this, IID_PEACH_FIRE, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
 }
 
 void StudentWorld::addShell(int x, int y, int dir)
 {
-    m_actor.push_back(new Flower(this, IID_SHELL, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
+    m_actor.push_back(new Shell(this, IID_SHELL, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
 }

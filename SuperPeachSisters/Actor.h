@@ -18,7 +18,7 @@ public:
     bool isBlockOrPipe();
     virtual bool blocks() = 0;
     virtual void bonk() = 0;
-    virtual void damage();
+    virtual bool damage();
 private:
     bool m_status;
     StudentWorld* m_world;
@@ -31,7 +31,7 @@ public:
     virtual void doSomething();
     virtual bool blocks();
     virtual void bonk();
-    virtual void damage();
+    virtual bool damage();
     bool ifStar();
     bool ifShoot();
     bool ifJump();
@@ -160,7 +160,7 @@ public:
     virtual void doSomething();
     virtual bool blocks();
     virtual void bonk();
-    virtual void damage();
+    virtual bool damage();
     virtual void postDeath();
 };
 

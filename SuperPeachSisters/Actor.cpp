@@ -33,7 +33,10 @@ bool Actor::isBlockOrPipe()
         return false;
 }
 
-void Actor::damage(){}
+bool Actor::damage()
+{
+    return false;
+}
 
 Peach::Peach(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
 {
@@ -120,7 +123,7 @@ void Peach::doSomething()
                 {
                     getWorld()->playSound(SOUND_PLAYER_FIRE);
                     time_to_recharge_before_next_fire = 8;
-                    if (getDirection() == 0)
+                    if (getDirection() == 180) //idk why peach is backwards lol so
                         getWorld()->addPeachFire(getX() - 4, getY(), 0);
                     else
                         getWorld()->addPeachFire(getX() + 4, getY(), 180);
@@ -166,9 +169,10 @@ void Peach::bonk()
     }
 }
 
-void Peach::damage()
+bool Peach::damage()
 {
     bonk();
+    return true;
 }
 
 bool Peach::blocks()
@@ -490,10 +494,12 @@ void Enemy::bonk()
     }
 }
 
-void Enemy::damage()
+bool Enemy::damage()
 {
     getWorld()->increaseScore(100);
+    postDeath();
     setDead();
+    return true;
 }
 
 Goomba::Goomba(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Enemy(swp, imageID, startX, startY, startDirection, depth, size)
@@ -536,10 +542,12 @@ void Piranha::doSomething()
             else
                 setDirection(0);
             
-            if (firing_delay > 0){
+            if (firing_delay > 0)
+            {
                 firing_delay--;
                 return;
             }
+            
             else
             {
                 if (getWorld()->ifPeachInRange(this))
