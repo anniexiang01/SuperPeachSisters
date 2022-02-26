@@ -14,8 +14,6 @@ public:
     bool isAlive();
     void setDead();
     StudentWorld* getWorld();
-    int power;
-    bool isBlockOrPipe();
     virtual bool blocks() = 0;
     virtual void bonk() = 0;
     virtual bool damage();
@@ -87,13 +85,10 @@ public:
     virtual void bonk();
 };
 
-class Pipe: public Actor
+class Pipe: public Block
 {
 public:
     Pipe(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size);
-    virtual void doSomething();
-    virtual bool blocks();
-    virtual void bonk();
 };
 
 class Goodie: public Actor
@@ -161,6 +156,7 @@ public:
     virtual bool blocks();
     virtual void bonk();
     virtual bool damage();
+private:
     virtual void postDeath();
 };
 

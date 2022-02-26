@@ -25,14 +25,6 @@ StudentWorld* Actor::getWorld()
     return m_world;
 }
 
-bool Actor::isBlockOrPipe()
-{
-    if (this->blocks())
-        return true;
-    else
-        return false;
-}
-
 bool Actor::damage()
 {
     return false;
@@ -294,20 +286,9 @@ void starBlock::bonk()
     }
 }
 
-Pipe::Pipe(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
+Pipe::Pipe(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Block(swp, imageID, startX, startY, startDirection, depth, size)
 {}
 
-void Pipe::doSomething(){}
-
-bool Pipe::blocks()
-{
-    return true;
-}
-
-void Pipe::bonk()
-{
-    getWorld()->playSound(SOUND_PLAYER_BONK);
-}
 
 Goodie::Goodie(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Actor(swp, imageID, startX*SPRITE_WIDTH, startY*SPRITE_HEIGHT, startDirection, depth, size)
 {}

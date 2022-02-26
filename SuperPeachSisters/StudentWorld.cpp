@@ -194,7 +194,7 @@ bool StudentWorld::isBlockingObject(int x, int y)
     {
         if (isOverlap(*it, x, y))
         {
-            if ((*it)->isBlockOrPipe())
+            if ((*it)->blocks())
                 return true;
         }
         it++;
