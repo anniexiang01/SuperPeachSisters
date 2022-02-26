@@ -23,6 +23,7 @@ int StudentWorld::init() //construct representation of current level (populate w
 {
     flag = false;
     mario = false;
+    shell = false;
     Level lev(assetPath());
     
     ostringstream oss; //use string streams to code level file through getLevel()
@@ -109,9 +110,23 @@ int StudentWorld::move()
     it = m_actor.begin();
     while (it != m_actor.end()) //all actors do something
     {
-        if ((*it)->isAlive()) //iterator becomes unvalid when fireball hits koopa (bc the shell is added in the same tick?)
+        if ((*it)->isAlive())
             (*it)->doSomething();
         it++;
+    }
+    
+    //add shell if neccessary
+    if (shell)
+    {
+        m_actor.push_back(new Shell(this, IID_SHELL, shellX/SPRITE_WIDTH, shellY/SPRITE_HEIGHT, shellDir, 1, 1));
+        shell = false;
+    }
+    
+    //add piranha fire if neccessary
+    if (piranhaFire)
+    {
+        m_actor.push_back(new PiranhaFire(this, IID_PIRANHA_FIRE, pfireX/SPRITE_WIDTH, pfireY/SPRITE_HEIGHT, pfireDir, 1, 1));
+        piranhaFire = false;
     }
     
     m_peach->doSomething();
@@ -293,17 +308,15 @@ bool StudentWorld::ifPeachLeft(Actor* a)
 bool StudentWorld::ifPeachInRange(Actor* a)
 {
     int distance;
-    if (ifPeachLeft(a))
-        distance = a->getX() - m_peach->getX();
-    else
-        distance = m_peach->getX() - a->getX();
+    distance = a->getX() - m_peach->getX();
     
     if (distance < 0)
         distance *= -1;
     
-    if (distance < 8*SPRITE_WIDTH)
+    if (distance < (8*SPRITE_WIDTH))
         return true;
-    return false;
+    else
+        return false;
 }
 
 void StudentWorld::setStar()
@@ -355,15 +368,27 @@ void StudentWorld::endGame()
 
 void StudentWorld::addPiranhaFire(int x, int y, int dir)
 {
-    m_actor.push_back(new PiranhaFire(this, IID_PIRANHA_FIRE, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
+    piranhaFire = true;
+    pfireX = x;
+    pfireY = y;
+    if (dir == 0)
+        pfireDir = 180;
+    else
+        pfireDir = 0;
 }
 
 void StudentWorld::addPeachFire(int x, int y, int dir)
 {
-    m_actor.push_back(new PeachFire(this, IID_PEACH_FIRE, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
+    m_actor.push_back(new PeachFire(this, IID_PEACH_FIRE, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1)); //can do this directly as peach is not in the vector of actors so adding an actor doesn't affect the iteration
 }
 
 void StudentWorld::addShell(int x, int y, int dir)
 {
-    m_actor.push_back(new Shell(this, IID_SHELL, x/SPRITE_WIDTH, y/SPRITE_HEIGHT, dir, 1, 1));
+    shell = true;
+    shellX = x;
+    shellY = y;
+    if (dir == 0)
+        shellDir = 180;
+    else
+        shellDir = 0;
 }

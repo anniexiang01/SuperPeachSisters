@@ -489,16 +489,16 @@ void Enemy::bonk()
     if (getWorld()->ifPeachStar()){
         getWorld()->playSound(SOUND_PLAYER_KICK);
         getWorld()->increaseScore(100);
-        postDeath();
         setDead();
+        postDeath();
     }
 }
 
 bool Enemy::damage()
 {
     getWorld()->increaseScore(100);
-    postDeath();
     setDead();
+    postDeath();
     return true;
 }
 
@@ -553,7 +553,7 @@ void Piranha::doSomething()
                 if (getWorld()->ifPeachInRange(this))
                 {
                     getWorld()->addPiranhaFire(getX(), getY(), getDirection());
-                    getWorld()->playSound(IID_PIRANHA_FIRE);
+                    getWorld()->playSound(SOUND_PIRANHA_FIRE);
                     firing_delay = 40;
                 }
             }

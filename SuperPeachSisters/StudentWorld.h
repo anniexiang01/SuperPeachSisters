@@ -57,6 +57,14 @@ private:
     Peach* m_peach; //pointer to Peach
     bool flag;
     bool mario;
+    bool shell;
+    int shellX;
+    int shellY;
+    int shellDir;
+    bool piranhaFire;
+    int pfireX;
+    int pfireY;
+    int pfireDir;
 };
 
 #endif // STUDENTWORLD_H_
