@@ -18,6 +18,17 @@ GameWorld* createStudentWorld(string assetPath)
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
 {}
+StudentWorld::~StudentWorld()
+{
+    vector<Actor*>:: iterator it = m_actor.begin();
+    while (it != m_actor.end()) //calls delete on all Actors, vector still have pointers but they point to nothing
+    {
+        delete *it;
+        it++;
+    }
+    m_actor.clear();
+    delete m_peach;
+}
 
 int StudentWorld::init() //construct representation of current level (populate with objects)
 {
@@ -159,6 +170,7 @@ int StudentWorld::move()
             delete *it;
             it = m_actor.erase(it);
         }
+        
     }
     
     
