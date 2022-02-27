@@ -610,3 +610,26 @@ PeachFire::PeachFire(StudentWorld* swp, int imageID, int startX, int startY, int
 Shell::Shell(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Projectile(swp, imageID, startX, startY, startDirection, depth, size)
 {}
 
+//all virtual destructors
+Actor::~Actor(){}
+Peach::~Peach(){}
+Block::~Block(){}
+mushroomBlock::~mushroomBlock(){}
+flowerBlock::~flowerBlock(){}
+starBlock::~starBlock(){}
+Pipe::~Pipe(){}
+Goodie::~Goodie(){}
+Star::~Star(){}
+Mushroom::~Mushroom(){}
+Flower::~Flower(){}
+Portal::~Portal(){}
+Flag::~Flag(){}
+Mario::~Mario(){}
+Enemy::~Enemy(){}
+Goomba::~Goomba(){}
+Koopa::~Koopa(){}
+Piranha::~Piranha(){}
+Projectile::~Projectile(){}
+PiranhaFire::~PiranhaFire(){}
+PeachFire::~PeachFire(){}
+Shell::~Shell(){}
