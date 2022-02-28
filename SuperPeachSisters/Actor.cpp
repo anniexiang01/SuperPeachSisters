@@ -111,14 +111,16 @@ void Peach::doSomething()
                     moveTo(getX() + 4, getY());
                 break;
             case KEY_PRESS_SPACE:
-                if (shootPower && time_to_recharge_before_next_fire == 0)
-                {
+                if (shootPower && time_to_recharge_before_next_fire == 0){
                     getWorld()->playSound(SOUND_PLAYER_FIRE);
-                    time_to_recharge_before_next_fire = 8;
-                    if (getDirection() == 180) //idk why peach is backwards lol so
-                        getWorld()->addPeachFire(getX() - 4, getY(), 0);
-                    else
-                        getWorld()->addPeachFire(getX() + 4, getY(), 180);
+                    if (getWorld()->isBlockingObject(getX(), getY() - 2) && getWorld()->isBlockingObject(getX() - 4, getY() - 2) && getWorld()->isBlockingObject(getX() + 4, getY() - 2))
+                    {
+                        time_to_recharge_before_next_fire = 8;
+                        if (getDirection() == 0)
+                            getWorld()->addPeachFire(getX() + 4 + SPRITE_WIDTH, getY(), 0);
+                        else
+                            getWorld()->addPeachFire(getX() - 4, getY(), 180);
+                    }
                 }
                 break;
             case KEY_PRESS_UP:
@@ -140,7 +142,7 @@ void Peach::doSomething()
 
 void Peach::bonk()
 {
-    if (starPower == true || tempInvincible == true)
+    if (starPower == true || tempInvincible == true) //if star, takes no damage
         return;
     else
     {
@@ -246,7 +248,7 @@ void Block::bonk()
 
 void mushroomBlock::bonk()
 {
-    if (getItem() == 1)
+    if (getItem() == 1) //if can drop item
     {
         getWorld()->playSound(SOUND_PLAYER_POWERUP);
         getWorld()->addMushroom(getX(), getY() + 8);
@@ -260,7 +262,7 @@ void mushroomBlock::bonk()
 
 void flowerBlock::bonk()
 {
-    if (getItem() == 1)
+    if (getItem() == 1) //if can drop item
     {
         getWorld()->playSound(SOUND_PLAYER_POWERUP);
         getWorld()->addFlower(getX(), getY() + 8);
@@ -274,7 +276,7 @@ void flowerBlock::bonk()
 
 void starBlock::bonk()
 {
-    if (getItem() == 1)
+    if (getItem() == 1) //if can drop item
     {
         getWorld()->playSound(SOUND_PLAYER_POWERUP);
         getWorld()->addStar(getX(), getY() + 8);
@@ -424,20 +426,20 @@ void Enemy::doSomething()
         return;
     }
     
-    else
+    else //move side to side on their respective platform without falling off
     {
-        if (getDirection() == 0)
+        if (getDirection() == 180)
         {
             if (getWorld()->isBlockingObject(getX() - 1, getY()))
             {
-                setDirection(180);
+                setDirection(0);
                 return;
             }
             else if (getWorld()->isBlockingObject(getX() - 1 - SPRITE_WIDTH + 1, getY() - 1)) // need to make sure it doesn't go partly off the edge
                 moveTo(getX() - 1, getY());
             else
             {
-                setDirection(180);
+                setDirection(0);
                 return;
             }
         }
@@ -445,14 +447,14 @@ void Enemy::doSomething()
         {
             if (getWorld()->isBlockingObject(getX() + 1, getY()))
             {
-                setDirection(0);
+                setDirection(180);
                 return;
             }
             else if (getWorld()->isBlockingObject(getX() + 1 + SPRITE_WIDTH - 1, getY() - 1)) // need to make sure it doesn't go partly off the edge
                 moveTo(getX() + 1, getY());
             else
             {
-                setDirection(0);
+                setDirection(180);
                 return;
             }
         }
@@ -467,7 +469,8 @@ void Enemy::bonk()
     if (!getWorld()->isOverlapPeach(this))
         return;
     
-    if (getWorld()->ifPeachStar()){
+    if (getWorld()->ifPeachStar())
+    {
         getWorld()->playSound(SOUND_PLAYER_KICK);
         getWorld()->increaseScore(100);
         setDead();
@@ -516,14 +519,14 @@ void Piranha::doSomething()
     {
         if (!getWorld()->ifPeachSameLevel(this))
             return;
-        else
+        else //if peach is the same level, turn to face peach
         {
             if (getWorld()->ifPeachLeft(this))
-                setDirection(180); //i know this seems backwards but it seems like how it works?
+                setDirection(180);
             else
                 setDirection(0);
             
-            if (firing_delay > 0)
+            if (firing_delay > 0) //decrement if there is firing delay
             {
                 firing_delay--;
                 return;
@@ -531,7 +534,7 @@ void Piranha::doSomething()
             
             else
             {
-                if (getWorld()->ifPeachInRange(this))
+                if (getWorld()->ifPeachInRange(this)) //if peach is close enough, fire
                 {
                     getWorld()->addPiranhaFire(getX(), getY(), getDirection());
                     getWorld()->playSound(SOUND_PIRANHA_FIRE);
@@ -554,14 +557,14 @@ bool Projectile::blocks()
 
 void Projectile::doSomething()
 {
-    tryDamage();
+    tryDamage(); //if there is a damageable actor where the projectile is, damage it and set dead
     
-    if (!getWorld()->isBlockingObject(getX(), getY() - 2))
+    if (!getWorld()->isBlockingObject(getX(), getY() - 2)) //fall if can
     {
         moveTo(getX(), getY() - 2);
     }
     
-    if (getDirection() == 0)
+    if (getDirection() == 180) //move in the direction its facing
     {
         if (getWorld()->isBlockingObject(getX() - 2, getY()))
         {
@@ -584,7 +587,7 @@ void Projectile::doSomething()
 
 void Projectile::tryDamage()
 {
-    if (getWorld()->damageActorAt(getX(), getY()))
+    if (getWorld()->damageActorAt(getX(), getY())) //if there is a damageable actor where the projectile is, damage it and set dead
     {
         setDead();
         return;
@@ -594,7 +597,7 @@ void Projectile::tryDamage()
 PiranhaFire::PiranhaFire(StudentWorld* swp, int imageID, int startX, int startY, int startDirection, int depth, double size): Projectile(swp, imageID, startX, startY, startDirection, depth, size)
 {}
 
-void PiranhaFire::tryDamage()
+void PiranhaFire::tryDamage() //if it overlaps peach, damage her and set dead
 {
     if (getWorld()->isOverlapPeach(this))
     {
